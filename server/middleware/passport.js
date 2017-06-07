@@ -5,7 +5,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const TwitterStrategy = require('passport-twitter').Strategy;
 const TotpStrategy = require('passport-totp').Strategy;
 const base32 = require('thirty-two');
-const sprintf = require('sprintf');
+const sprintfjs = require('sprintf-js');
 const crypto = require('crypto');
 const models = require('../../db/models');
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const middleware = require('../middleware');
+const sprintfjs = require('sprintf-js');
 
 const router = express.Router();
 
@@ -77,7 +78,7 @@ router.get('/auth/twitter/callback', middleware.passport.authenticate('twitter',
   failureRedirect: '/login'
 }));
 
-router.get('/twofa', isLoggedIn, function(req, res) {
+router.get('/twofa', middleware.auth.verify, function(req, res) {
     if(!req.user.key) {
         console.log("Logic error, totp-input requested with no key set");
         res.redirect('/login');
@@ -86,6 +87,23 @@ router.get('/twofa', isLoggedIn, function(req, res) {
     res.render('totp-input');
 });
 
-router.post('/twofa', )
+router.post('/twofa', middleware.auth.verify, middleware.passport.authenticate('totp', {
+  failureRedirect: '/login',
+  successRedirect: '/totpsetup'
+}));
+
+router.get('/totpsetup', function(req, res) {
+  let url = null;
+  if (req.user.key !== undefined) {
+    let qrData = sprintfjs('otpauth://totp/%s?secret=%s', req.user.first, req.user.key)
+    url = "https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=" + qrData;
+    res.render('totpsetup', {
+      user: req.user,
+      qrUrl: url
+    });
+  }
+});
+
+
 
 module.exports = router;
