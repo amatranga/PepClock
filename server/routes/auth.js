@@ -29,7 +29,7 @@ router.route('/login')
   .post(middleware.passport.authenticate('local-login', { 
     failureRedirect: '/login',
     failureFlash: true
-  }), middleware.auth.redirect);
+  }), middleware.auth.twoFactor);  //was middleware.auth.redirect
 
 router.route('/signup')
   .get((req, res) => {
@@ -38,7 +38,7 @@ router.route('/signup')
   .post(middleware.passport.authenticate('local-signup', {
     failureRedirect: '/signup',
     failureFlash: true
-  }), middleware.auth.redirect);
+  }), middleware.auth.twoFactor);  //was middleware.auth.redirect
 
 router.route('/profile')
   .get(middleware.auth.verify, (req, res) => {
@@ -78,16 +78,16 @@ router.get('/auth/twitter/callback', middleware.passport.authenticate('twitter',
   failureRedirect: '/login'
 }));
 
-router.get('/twofa', middleware.auth.verify, function(req, res) {
-    // if(!req.user.key) {
-    //     console.log("Logic error, totp-input requested with no key set");
-    //     res.redirect('/login');
-    // }
+router.get('/totp-input', middleware.auth.verify, function(req, res) {
+    if(!req.user.key) {
+        console.log("Logic error, totp-input requested with no key set");
+        res.redirect('/login');
+    }
     
-    res.render('totpsetup.ejs');
+    res.render('totpinput.ejs');
 });
 
-router.post('/twofa', middleware.auth.verify, middleware.passport.authenticate('totp', {
+router.post('/totpinput', middleware.auth.verify, middleware.passport.authenticate('twofa', {
   failureRedirect: '/login',
   successRedirect: '/totpsetup'
 }));
@@ -102,7 +102,12 @@ router.get('/totpsetup', function(req, res) {
       qrUrl: url
     });
   }
+  res.status(404).send('Uhoh! req.user.key is undefined');
 });
+
+router.post('/totpsetup', middleware.auth.verify, function(req, res) {
+  console.log(req.user, 'user from router.post/totpsetup');
+})
 
 
 

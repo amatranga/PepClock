@@ -21,6 +21,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/api/twofa', routes.auth);
 app.use('/api/totpsetup', routes.auth);
+app.use('/api/totpinput', routes.auth);
 
 app.use('/', routes.auth);
 app.use('/api', routes.api);

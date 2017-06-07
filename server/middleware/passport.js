@@ -80,12 +80,14 @@ passport.use('local-login', new LocalStrategy({
   passReqToCallback: true
 },
   (req, email, password, done) => {
+
     // fetch any profiles that have a local auth account with this email address
     return models.Profile.where({ email }).fetch({
       withRelated: [{
         auths: query => query.where({ type: 'local' })
       }]
     })
+
       .then(profile => {
         // if there is no profile with that email or if there is no local auth account with profile
         if (!profile || !profile.related('auths').at(0)) {

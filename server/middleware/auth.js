@@ -30,6 +30,10 @@ module.exports.render = (req, res) => {
   res.render('index.ejs', {user: JSON.stringify(req.user)});
 };
 
+module.exports.twoFactor = (req, res) => {
+  res.render('twoFactorOptIn.ejs', {user: JSON.stringify(req.user)});
+};
+
 module.exports.updateAndRender = (req, res) => {
   const eventId = parseInt(req.params.id);
   const inviteId = req.query.invite;
