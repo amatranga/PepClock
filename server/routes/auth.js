@@ -77,4 +77,15 @@ router.get('/auth/twitter/callback', middleware.passport.authenticate('twitter',
   failureRedirect: '/login'
 }));
 
+router.get('/twofa', isLoggedIn, function(req, res) {
+    if(!req.user.key) {
+        console.log("Logic error, totp-input requested with no key set");
+        res.redirect('/login');
+    }
+    
+    res.render('totp-input');
+});
+
+router.post('/twofa', )
+
 module.exports = router;

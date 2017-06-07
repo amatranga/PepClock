@@ -12,6 +12,14 @@ module.exports.verify = (req, res, next) => {
   res.redirect('/login');
 };
 
+module.exports.ensureTOTP = (req, res, next) => {
+  if ((req.user.key && req.session.method === 'totp') || (!req.user.key && req.session.method === 'plain')) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+}
+
 module.exports.redirect = (req, res) => {
   let redirect = req.session.returnTo || '/dashboard';
   delete req.session.returnTo;
