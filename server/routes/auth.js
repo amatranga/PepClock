@@ -78,36 +78,51 @@ router.get('/auth/twitter/callback', middleware.passport.authenticate('twitter',
   failureRedirect: '/login'
 }));
 
-router.get('/totp-input', middleware.auth.verify, function(req, res) {
-    if(!req.user.key) {
-        console.log("Logic error, totp-input requested with no key set");
-        res.redirect('/login');
-    }
+router.get('/noTwoFA', function(req, res) {
+  req.session.method = 'plain';
+  req.session.secret = undefined;
+  req.user.twoFactorEnabled = 0;
+  console.log(req.user, 'req.user')
+  res.redirect('/dashboard');
+});   //dashboard
+
+router.get('/yesTwoFA', middleware.passport.authenticate('twofa'))
+
+// router.get('/totp-input', middleware.auth.verify, function(req, res) {
+//     if(!req.user.key) {
+//         console.log("Logic error, totp-input requested with no key set");
+//         res.redirect('/login');
+//     }
     
-    res.render('totpinput.ejs');
-});
+//     res.render('totpinput.ejs');
+// });
 
-router.post('/totpinput', middleware.auth.verify, middleware.passport.authenticate('twofa', {
-  failureRedirect: '/login',
-  successRedirect: '/totpsetup'
-}));
+// router.post('/totpinput', middleware.auth.verify, middleware.passport.authenticate('twofa', {
+//   failureRedirect: '/login',
+//   successRedirect: '/totp-setup'
+// }));
 
-router.get('/totpsetup', function(req, res) {
-  let url = null;
-  if (req.user.key !== undefined) {
-    let qrData = sprintfjs('otpauth://totp/%s?secret=%s', req.user.first, req.user.key)
-    url = "https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=" + qrData;
-    res.render('totpsetup.ejs', {
-      user: req.user,
-      qrUrl: url
-    });
-  }
-  res.status(404).send('Uhoh! req.user.key is undefined');
-});
+// router.get('/totp-setup', function(req, res) {
+//   req.session.key = undefined;
+//   console.log('Trying to make a TOTP with req.session', req.session);
+//   let url = null;
+//   if (req.user.email !== undefined) {
+//     req.session.qrData = sprintfjs('otpauth://totp/%s?secret=%s', req.user.first, req.session.key)
+//     req.session.url = "https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=" + qrData;
 
-router.post('/totpsetup', middleware.auth.verify, function(req, res) {
-  console.log(req.user, 'user from router.post/totpsetup');
-})
+//     console.log(req.session);
+//     res.redirect('totpInput.ejs', {
+//       user: req.user,
+//       session: req.sesison,
+//       qrUrl: url
+//     });
+//   }
+//   res.status(404).send('Uhoh! req.user.key is undefined');
+// });
+
+// router.post('/totpsetup', middleware.auth.verify, function(req, res) {
+//   console.log(req.user, 'user from router.post/totpsetup');
+// })
 
 
 

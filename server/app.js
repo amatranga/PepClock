@@ -19,9 +19,16 @@ app.use(middleware.flash());
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use('/api/twofa', routes.auth);
-app.use('/api/totpsetup', routes.auth);
-app.use('/api/totpinput', routes.auth);
+app.use('/api/noTwoFA', routes.auth);
+app.use('/api/yesTwoFA', routes.auth);
+
+
+//These might not be needed...
+// app.use('/api/twofa', routes.auth);
+// app.use('/api/totpsetup', routes.auth);
+// app.use('/api/totpinput', routes.auth);
+//...
+
 
 app.use('/', routes.auth);
 app.use('/api', routes.api);
