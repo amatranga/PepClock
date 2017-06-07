@@ -79,12 +79,12 @@ router.get('/auth/twitter/callback', middleware.passport.authenticate('twitter',
 }));
 
 router.get('/twofa', middleware.auth.verify, function(req, res) {
-    if(!req.user.key) {
-        console.log("Logic error, totp-input requested with no key set");
-        res.redirect('/login');
-    }
+    // if(!req.user.key) {
+    //     console.log("Logic error, totp-input requested with no key set");
+    //     res.redirect('/login');
+    // }
     
-    res.render('totpinput');
+    res.render('totpsetup.ejs');
 });
 
 router.post('/twofa', middleware.auth.verify, middleware.passport.authenticate('totp', {
@@ -97,7 +97,7 @@ router.get('/totpsetup', function(req, res) {
   if (req.user.key !== undefined) {
     let qrData = sprintfjs('otpauth://totp/%s?secret=%s', req.user.first, req.user.key)
     url = "https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=" + qrData;
-    res.render('totpsetup', {
+    res.render('totpsetup.ejs', {
       user: req.user,
       qrUrl: url
     });
