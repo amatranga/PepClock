@@ -84,7 +84,7 @@ router.get('/twofa', middleware.auth.verify, function(req, res) {
         res.redirect('/login');
     }
     
-    res.render('totp-input');
+    res.render('totpinput');
 });
 
 router.post('/twofa', middleware.auth.verify, middleware.passport.authenticate('totp', {
