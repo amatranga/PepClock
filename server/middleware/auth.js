@@ -31,8 +31,7 @@ module.exports.render = (req, res) => {
 };
 
 module.exports.twoFactor = (req, res) => {
-  if (!req.user.twoFactorEnabled || req.user.twoFactorEnabled === 1) {
-    console.log('twoFactor not enabled or does not exist');
+  if (!req.user.twoFactorEnabled || req.user.twoFactorEnabled < 2) {
     res.render('twoFactorOptIn.ejs', {user: JSON.stringify(req.user)});
   }
   else {
