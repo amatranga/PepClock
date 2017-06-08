@@ -29,7 +29,6 @@ app.use('/api/totp-setup', routes.auth);
 app.use('/api/totp-input', routes.auth);
 //...
 
-
 app.use('/', routes.auth);
 app.use('/api', routes.api);
 app.use('/api/profiles', routes.profiles);

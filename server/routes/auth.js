@@ -83,54 +83,47 @@ router.get('/auth/twitter/callback', middleware.passport.authenticate('twitter',
 router.get('/noTwoFA', function(req, res) {
   req.session.method = 'plain';
   req.session.secret = undefined;
-  req.user.twoFactorEnabled = 0;
+  req.user.twoFactorEnabled = 1;
   res.redirect('/dashboard');
-});   //dashboard
+});
 
 router.get('/yesTwoFA', function(req, res) {
   req.session.method = 'totp';
-  res.redirect('/totp-setup')
+  req.user.twoFactorEnabled = 2;
+  res.redirect('/totp-setup');
 });
 
 router.get('/totp-setup', function(req, res) {
   if (!req.user || !req.user.email) {
-    console.log('User or email missing')
     res.redirect('/login');
   }
-  req.session.key = base32.encode(crypto.randomBytes(16)).toString().replace(/=/g, '');
-  let url = null;
-  // if (req.user.email !== undefined) {
-  //   req.session.qrData = sprintfjs('otpauth://totp/%s?secret=%s', req.user.first, req.session.key)
-  //   req.session.url = "https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=" + qrData;
+  let rndBytes = crypto.randomBytes(32);
+  let userString = rndBytes.toString('hex').slice(0,6);
+  let rest = rndBytes.toString('hex').slice(6)
+  req.session.key = base32.encode(rndBytes).toString().replace(/=/g, '');
 
   res.redirect('/totp-input')
-    // res.redirect('/totp-input', {
-    //   user: req.user,
-    //   session: req.sesison,
-    //   qrUrl: url
-    // });
   });
 
 router.get('/totp-input', middleware.auth.verify, function(req, res) {
-  console.log('We are HERE!!!');
-  console.log(req.session)
     if(!req.session.key) {
-        console.log("Logic error, totp-input requested with no key set");
+        console.error("Logic error, totp-input requested with no key set");
         res.redirect('/login');
     }
     
     res.render('totpinput.ejs');
 });
 
-// router.post('/totpinput', middleware.auth.verify, middleware.passport.authenticate('twofa', {
-//   failureRedirect: '/login',
-//   successRedirect: '/totp-setup'
+// router.post('/totp-input', middleware.auth.verify, middleware.passport.authenticate('twofa', {
+//   session: session
+// }));
+
+// router.post('/totp-input', middleware.auth.verify, middleware.passport.authenticate('twofa', {
+//   failureRedirect: '/totp-input',
+//   successRedirect: '/dashboard'
 // }));
 
 
-// router.post('/totpsetup', middleware.auth.verify, function(req, res) {
-//   console.log(req.user, 'user from router.post/totpsetup');
-// })
 
 
 

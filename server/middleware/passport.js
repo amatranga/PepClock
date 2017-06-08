@@ -127,7 +127,8 @@ passport.use('twofa', new TotpStrategy({
     if (!key) {
       return done(new Error('no key on the user'));
     } else {
-      return done(null, base32.decode(key), 30)
+      return done(new Error('successfully redirected using TOTP-Strategy'))
+      // return done(null, base32.decode(key), 30)
     }
   }
 ));
