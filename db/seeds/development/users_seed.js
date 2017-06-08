@@ -11,7 +11,8 @@ exports.seed = function (knex, Promise) {
         first: 'System',
         last: 'Admin',
         display: 'Administrator',
-        email: 'admin@domain.com'
+        email: 'admin@domain.com',
+        two_factor_enabled: 1
       }).save();
     })
     .error(err => {
