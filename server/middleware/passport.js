@@ -120,13 +120,16 @@ passport.use('local-login', new LocalStrategy({
 passport.use('twofa', new TotpStrategy({
   usernameField: 'email',
   password: 'password',
-  key: 'This will be a super-duper ultra secure key',
   passReqToCallback: true
 },
   (user, done) => {
-    if (!user.key) {
+    console.log(user, '~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    let key = user.key;
+    if (!key) {
+      console.log(user, '===========')
       return done(new Error('no key on the user'));
     } else {
+      console.log('Hit done!');
       return done(null, base32.decode(key), 30)
     }
   }

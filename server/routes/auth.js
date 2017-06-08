@@ -82,11 +82,14 @@ router.get('/noTwoFA', function(req, res) {
   req.session.method = 'plain';
   req.session.secret = undefined;
   req.user.twoFactorEnabled = 0;
-  console.log(req.user, 'req.user')
   res.redirect('/dashboard');
 });   //dashboard
 
-router.get('/yesTwoFA', middleware.passport.authenticate('twofa'))
+router.get('/yesTwoFA', function(req, res) {
+  req.user.key = middleware.auth.session;
+  console.log(req.user);
+  res.status(200).send(req.user);
+});
 
 // router.get('/totp-input', middleware.auth.verify, function(req, res) {
 //     if(!req.user.key) {
