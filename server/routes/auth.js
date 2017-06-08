@@ -1,6 +1,8 @@
 const express = require('express');
-const middleware = require('../middleware');
 const sprintfjs = require('sprintf-js');
+const base32 = require('thirty-two');
+const crypto = require('crypto');
+const middleware = require('../middleware');
 
 const router = express.Router();
 
@@ -86,42 +88,45 @@ router.get('/noTwoFA', function(req, res) {
 });   //dashboard
 
 router.get('/yesTwoFA', function(req, res) {
-  req.user.key = middleware.auth.session;
-  console.log(req.user);
-  res.status(200).send(req.user);
+  req.session.method = 'totp';
+  res.redirect('/totp-setup')
 });
 
-// router.get('/totp-input', middleware.auth.verify, function(req, res) {
-//     if(!req.user.key) {
-//         console.log("Logic error, totp-input requested with no key set");
-//         res.redirect('/login');
-//     }
+router.get('/totp-setup', function(req, res) {
+  if (!req.user || !req.user.email) {
+    console.log('User or email missing')
+    res.redirect('/login');
+  }
+  req.session.key = base32.encode(crypto.randomBytes(16)).toString().replace(/=/g, '');
+  let url = null;
+  // if (req.user.email !== undefined) {
+  //   req.session.qrData = sprintfjs('otpauth://totp/%s?secret=%s', req.user.first, req.session.key)
+  //   req.session.url = "https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=" + qrData;
+
+  res.redirect('/totp-input')
+    // res.redirect('/totp-input', {
+    //   user: req.user,
+    //   session: req.sesison,
+    //   qrUrl: url
+    // });
+  });
+
+router.get('/totp-input', middleware.auth.verify, function(req, res) {
+  console.log('We are HERE!!!');
+  console.log(req.session)
+    if(!req.session.key) {
+        console.log("Logic error, totp-input requested with no key set");
+        res.redirect('/login');
+    }
     
-//     res.render('totpinput.ejs');
-// });
+    res.render('totpinput.ejs');
+});
 
 // router.post('/totpinput', middleware.auth.verify, middleware.passport.authenticate('twofa', {
 //   failureRedirect: '/login',
 //   successRedirect: '/totp-setup'
 // }));
 
-// router.get('/totp-setup', function(req, res) {
-//   req.session.key = undefined;
-//   console.log('Trying to make a TOTP with req.session', req.session);
-//   let url = null;
-//   if (req.user.email !== undefined) {
-//     req.session.qrData = sprintfjs('otpauth://totp/%s?secret=%s', req.user.first, req.session.key)
-//     req.session.url = "https://chart.googleapis.com/chart?chs=166x166&chld=L|0&cht=qr&chl=" + qrData;
-
-//     console.log(req.session);
-//     res.redirect('totpInput.ejs', {
-//       user: req.user,
-//       session: req.sesison,
-//       qrUrl: url
-//     });
-//   }
-//   res.status(404).send('Uhoh! req.user.key is undefined');
-// });
 
 // router.post('/totpsetup', middleware.auth.verify, function(req, res) {
 //   console.log(req.user, 'user from router.post/totpsetup');

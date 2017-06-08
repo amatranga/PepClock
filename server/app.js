@@ -25,8 +25,8 @@ app.use('/api/yesTwoFA', routes.auth);
 
 //These might not be needed...
 // app.use('/api/twofa', routes.auth);
-// app.use('/api/totpsetup', routes.auth);
-// app.use('/api/totpinput', routes.auth);
+app.use('/api/totp-setup', routes.auth);
+app.use('/api/totp-input', routes.auth);
 //...
 
 

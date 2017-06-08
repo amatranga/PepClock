@@ -123,13 +123,10 @@ passport.use('twofa', new TotpStrategy({
   passReqToCallback: true
 },
   (user, done) => {
-    console.log(user, '~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     let key = user.key;
     if (!key) {
-      console.log(user, '===========')
       return done(new Error('no key on the user'));
     } else {
-      console.log('Hit done!');
       return done(null, base32.decode(key), 30)
     }
   }
