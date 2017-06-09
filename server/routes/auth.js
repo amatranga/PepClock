@@ -32,7 +32,7 @@ router.route('/login')
   .post(middleware.passport.authenticate('local-login', { 
     failureRedirect: '/login',
     failureFlash: true
-  }), middleware.auth.twoFactor);  //was middleware.auth.redirect
+  }), middleware.auth.twoFactor);
 
 router.route('/signup')
   .get((req, res) => {
@@ -41,7 +41,7 @@ router.route('/signup')
   .post(middleware.passport.authenticate('local-signup', {
     failureRedirect: '/signup',
     failureFlash: true
-  }), middleware.auth.twoFactor);  //was middleware.auth.redirect
+  }), middleware.auth.twoFactor);
 
 router.route('/profile')
   .get(middleware.auth.verify, (req, res) => {
