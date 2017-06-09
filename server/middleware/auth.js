@@ -31,12 +31,21 @@ module.exports.render = (req, res) => {
 };
 
 module.exports.twoFactor = (req, res) => {
-  if (!req.user.twoFactorEnabled || req.user.twoFactorEnabled < 2) {
-    res.render('twoFactorOptIn.ejs', {user: JSON.stringify(req.user)});
-  }
-  else {
-    res.render('index.ejs', {user: JSON.stringify(req.user)});
-  }
+  const userId = req.user.id;
+
+  models.Profile.where({id: userId}).fetch()
+    .then(profile => {
+      let twoFactor = profile.attributes.two_factor_enabled;
+      if (twoFactor === 0) {
+        res.render('twoFactorOptIn.ejs', {user: JSON.stringify(profile.attributes)});
+      }
+      if (twoFactor === 1) {
+        res.redirect('/noTwoFA');
+      }
+      if (twoFactor === 2) {
+        res.redirect('/yesTwoFA')
+      }
+    });
 };
 
 module.exports.twoFactorVerify = (req, res) => {
