@@ -95,12 +95,16 @@ router.get('/yesTwoFA', function(req, res) {
 
 router.get('/totp-setup', function(req, res) {
   if (!req.user || !req.user.email) {
+    console.error('User or user email undefined');
     res.redirect('/login');
   }
   let rndBytes = crypto.randomBytes(32);
   let userString = rndBytes.toString('hex').slice(0,6);
   let rest = rndBytes.toString('hex').slice(6)
   req.session.key = base32.encode(rndBytes).toString().replace(/=/g, '');
+
+  console.log(req.session.key);
+  console.log(req.session.key.slice(0,6));
 
   res.redirect('/totp-input')
   });
@@ -111,17 +115,13 @@ router.get('/totp-input', middleware.auth.verify, function(req, res) {
         res.redirect('/login');
     }
     
+    console.log(req.session.key);
     res.render('totpinput.ejs');
 });
 
-// router.post('/totp-input', middleware.auth.verify, middleware.passport.authenticate('twofa', {
-//   session: session
-// }));
-
-// router.post('/totp-input', middleware.auth.verify, middleware.passport.authenticate('twofa', {
-//   failureRedirect: '/totp-input',
-//   successRedirect: '/dashboard'
-// }));
+router.post('/totp-input', middleware.auth.twoFactorVerify, function(req, res) {
+  res.render('index.ejs', {user: req.user});
+});
 
 
 
