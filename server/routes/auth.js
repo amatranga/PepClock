@@ -3,6 +3,7 @@ const sprintfjs = require('sprintf-js');
 const base32 = require('thirty-two');
 const crypto = require('crypto');
 const middleware = require('../middleware');
+const models = require('../../db/models');
 
 const router = express.Router();
 
@@ -81,16 +82,34 @@ router.get('/auth/twitter/callback', middleware.passport.authenticate('twitter',
 }));
 
 router.get('/noTwoFA', function(req, res) {
+  const userId = req.user.id;
   req.session.method = 'plain';
   req.session.secret = undefined;
-  req.user.twoFactorEnabled = 1;
-  res.redirect('/dashboard');
+
+  models.Profile.where({id: userId}).fetch()
+    .then(profile => {
+      profile.set({
+        two_factor_enabled: 1
+      }).save()
+    })
+    .then(() => {
+      res.redirect('/dashboard')
+    });
 });
 
 router.get('/yesTwoFA', function(req, res) {
+  const userId = req.user.id;
   req.session.method = 'totp';
-  req.user.twoFactorEnabled = 2;
-  res.redirect('/totp-setup');
+
+  models.Profile.where({id: userId}).fetch()
+    .then(profile => {
+      profile.set({
+        two_factor_enabled: 2
+      }).save()
+    })
+    .then(() => {
+      res.redirect('/totp-setup');
+    });
 });
 
 router.get('/totp-setup', function(req, res) {
@@ -103,8 +122,6 @@ router.get('/totp-setup', function(req, res) {
   let rest = rndBytes.toString('hex').slice(6)
   req.session.key = base32.encode(rndBytes).toString().replace(/=/g, '');
 
-  console.log(req.session.key);
-  console.log(req.session.key.slice(0,6));
 
   res.redirect('/totp-input')
   });
@@ -115,7 +132,8 @@ router.get('/totp-input', middleware.auth.verify, function(req, res) {
         res.redirect('/login');
     }
     
-    console.log(req.session.key);
+
+    console.log(req.session.key.slice(0,6), 'THIS WILL BE SENT TO THE USER');
     res.render('totpinput.ejs');
 });
 

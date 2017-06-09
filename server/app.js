@@ -22,12 +22,8 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/noTwoFA', routes.auth);
 app.use('/api/yesTwoFA', routes.auth);
 
-
-//These might not be needed...
-// app.use('/api/twofa', routes.auth);
 app.use('/api/totp-setup', routes.auth);
 app.use('/api/totp-input', routes.auth);
-//...
 
 app.use('/', routes.auth);
 app.use('/api', routes.api);
