@@ -35,12 +35,10 @@ passport.use('local-signup', new LocalStrategy({
   passReqToCallback: true
 },
   (req, email, password, done) => {
-    // check to see if there is a local account with this email address
     //check to see if there is an account with this id
     return models.Profile.where({ email }).fetch({
       withRelated: [{
-        // auths: query => query.where({ type: 'local' })
-        auths: query => query.where({ profile_id: req.user.id })
+        auths: query => query.where({ profile_id: undefined })
       }]
     })
       .then(profile => {
