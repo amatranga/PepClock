@@ -35,22 +35,17 @@ passport.use('local-signup', new LocalStrategy({
   passReqToCallback: true
 },
   (req, email, password, done) => {
-    //check to see if there is an account with this id
-    return models.Profile.where({ email }).fetch({
-      withRelated: [{
-        auths: query => query.where({ profile_id: undefined })
-      }]
-    })
+    // check to see if there is an account with this id
+    return models.Profile.where({ email }).fetch(    )
       .then(profile => {
         // create a new profile if a profile does not exist
         if (!profile) {
           return models.Profile.forge({ first: req.body.first, email: email }).save();
         }
-        // throw if local auth account already exists
-        if (profile.related('auths').at(0)) {
+        // throw if any auth account already exists
+        if (profile) {
           throw profile;
         }
-
         return profile;
       })
       .tap(profile => {
