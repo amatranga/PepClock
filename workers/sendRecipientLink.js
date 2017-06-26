@@ -1,3 +1,4 @@
+require('dotenv').config();
 const models = require('../db/models');
 const email = require('./utils/email');
 
@@ -52,8 +53,38 @@ class sendRecipientLink {
   }
 
   sendRecipientEmail (recipient, cb) {
-    const link = `${recipient.title}: http://localhost:3000/events/${recipient.eventId}?recipient=${recipient.inviteId}`;
-    email.sendToRecipient(link, recipient.email, cb);
+    this.validateEmail(recipient.email, (mess, err) => {
+      if (err) {
+        cb(err);
+      } else {
+        const link = `${recipient.title}: ${process.env.LINK_DOMAIN}/events/${recipient.eventId}?recipient=${recipient.inviteId}`;
+        email.sendToRecipient(link, recipient.email, cb);
+      }
+    });
+  }
+
+  validateEmail (address, cb) {
+    if (address.length) {
+      email.validateEmail(address, (validation, err) => {
+        if (err) {
+          this.updateEventStatus('error-sending', () => {
+            cb(err);
+          });
+        } else {
+          if (!validation) {
+            this.updateEventStatus('invalid-email', () => {
+              cb(null, 'invalid email address');
+            });
+          } else {
+            cb(validation, null);
+          }
+        }
+      });
+    } else {
+      this.updateEventStatus('invalid-email', () => {
+        cb(null, 'email address empty');
+      });
+    }
   }
 
   updateEventStatus (status, cb) {

@@ -10,6 +10,9 @@ router.route('/')
 router.route('/users')
   .get(EventController.getEventsByContributor);
 
+router.route('/recipient')
+  .get(EventController.getRecipientEvents);
+
 router.route('/:id')
   .get(EventController.getById)
   .put(EventController.update);

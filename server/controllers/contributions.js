@@ -9,7 +9,7 @@ module.exports.create = (req, res) => {
       media_url: req.body.contributionMediaUrl,
       contributor_id: result.id,
       event_id: req.body.eventId,
-      user_id: req.session.passport.user 
+      user_id: req.session.passport.user
     })
     .save()
     .then(result => {
@@ -26,8 +26,7 @@ module.exports.create = (req, res) => {
 };
 
 module.exports.getByEvent = (req, res) => {
-  console.log(req.params.id);
-  models.Contribution.where({event_id: req.params.id}).fetchAll({withRelated: ['user']}).then(result =>{ 
+  models.Contribution.where({event_id: req.params.id}).fetchAll({withRelated: ['user']}).then(result =>{
     res.status(200).send(result);
   })
   .catch(err => {

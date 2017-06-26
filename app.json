@@ -3,6 +3,15 @@
   "scripts": {
   },
   "env": {
+    "AWS_ACCESS_KEY_ID": {
+      "required": true
+    },
+    "AWS_BUCKET": {
+      "required": true
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "required": true
+    },
     "DATABASE_URL": {
       "required": true
     },

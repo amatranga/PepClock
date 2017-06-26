@@ -127,8 +127,8 @@ class Edit extends React.Component {
     } else {
       return (
         <div>
-          <div className="row">
-            <div className="col">
+          <div className="row justify-content-center">
+            <div className="col text-center">
                 <h1 style={{marginBottom: '2rem' }}>Edit your PepClock</h1>
             </div>
           </div>

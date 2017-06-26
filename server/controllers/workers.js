@@ -17,6 +17,13 @@ module.exports.sendRecipientLinks = (req, res) => {
         console.log('done with no errors');
         return;
       }
+
+      if (err === 'email address empty' || err === 'invalid email address') {
+        console.log(err);
+        worker.work(callback);
+        return;
+      }
+
       console.log(err);
       return;
     }

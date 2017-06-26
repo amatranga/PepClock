@@ -1,22 +1,22 @@
 <% include head.ejs%>
 
-    <div class="container-fluid">
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col text-center">
-        <!--<div class="page-header text-center">-->
+
                 <h1 style="margin-bottom:15px"> My Profile </h1>
                 <a href="/dashboard" class="btn btn-secondary btn-sm">Return to PepClock</a>
                 <a href="/logout" class="btn btn-secondary btn-sm">Logout</a>
-                
-                <hr />
-                
-                <p><strong>display name</strong>: <%= user.display || user.first %><br></p>
-                <p><strong>email</strong>: <%= user.email %></p>
-                
+
                 <hr />
 
-                <a href="yesTwoFA" class="btn btn-outline-info btn-md">Enable Two-Factor Authentication</a>
-                <a href="/noTwoFA" class="btn btn-outline-info btn-md">Disable Two-Factor Authentication</a>
+                <p><strong>display name</strong>: <%= user.display || user.first %><br></p>
+                <p><strong>email</strong>: <%= user.email %></p>
+
+                <hr />
+
+                <a href="TwoFA?twoFA=true" class="btn btn-outline-info">Enable Two-Factor Authentication</a>
+                <a href="/TwoFA?twoFA=false" class="btn btn-outline-info">Disable Two-Factor Authentication</a>
             </div>
         </div>
     </div>

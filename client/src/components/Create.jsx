@@ -84,8 +84,8 @@ class Create extends React.Component {
     } else {
       return (
         <div>
-          <div className="row">
-            <div className="col">
+          <div className="row justify-content-center">
+            <div className="col text-center">
                 <h1 style={{marginBottom: '2rem' }}>Create a new PepClock</h1>
             </div>
           </div>

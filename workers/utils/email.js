@@ -1,14 +1,16 @@
 require('dotenv').config();
 const axios = require('axios');
 
-const url = 'https://api:' + process.env.MAILGUN_API_KEY + '@api.mailgun.net/v3/app6ac6b571b02e4efcbbba7f891d5131b0.mailgun.org/messages'
+const url = 'https://api:' + process.env.MAILGUN_API_KEY + '@api.mailgun.net/v3/' + process.env.MAILGUN_SENDING_DOMAIN + '/messages';
+const from = 'PepClock <PepClock@' + process.env.MAILGUN_SENDING_DOMAIN + '>';
+const appURL = process.env.LINK_DOMAIN;
 
 exports.sendToRecipient = (link, email, cb) => {
   axios({
     method: 'POST',
     url: url,
     params: {
-      from: 'Josh <josh@app6ac6b571b02e4efcbbba7f891d5131b0.mailgun.org>',
+      from: from,
       to: email,
       subject: 'PepClock tolls for Thee!',
       text: 'You have Pep over at PepClock! \n' + link
@@ -23,7 +25,7 @@ exports.batchSendInvitations = (recipientVariable, emails, cb) => {
     method: 'POST',
     url: url,
     params: {
-      from: 'Josh <josh@app6ac6b571b02e4efcbbba7f891d5131b0.mailgun.org>',
+      from: from,
       to: emails,
       'recipient-variables': recipientVariable,
       subject: 'Contribute some Pep to your Friend',
@@ -34,13 +36,29 @@ exports.batchSendInvitations = (recipientVariable, emails, cb) => {
   .catch(response => cb('ERROR!'));
 };
 
+exports.batchSendOpenNotification = (eventId, emails, cb) => {
+  const link = appURL + '/events/' + eventId;
+  axios({
+    method: 'POST',
+    url: url,
+    params: {
+      from: from,
+      to: emails,
+      subject: 'Your PepClock event was just opened',
+      text: 'The event you contributed to was viewed. Join in over at PepClock: ' + link
+    }
+  })
+  .then(response => cb(response))
+  .catch(response => cb(response));
+};
+
 exports.sendTwoFactorCode = (code, email, cb) => {
 
   axios({
     method: 'POST',
     url: url,
     params: {
-      from: 'Alex <alex@app6ac6b571b02e4efcbbba7f891d5131b0.mailgun.org>',
+      from: from,
       to: email,
       subject: 'Your PepClock Two-Factor Authentication Code',
       text: 'Here is your PepClock Two-Factor Authentication Code: \n' + code
@@ -50,6 +68,22 @@ exports.sendTwoFactorCode = (code, email, cb) => {
   .catch(err => cb(err, null));
 };
 
+exports.validateEmail = (email, cb) => {
+  axios({
+    method: 'GET',
+    url: 'https://api.mailgun.net/v3/address/validate',
+    params: {
+      api_key: process.env.MAILGUN_PUBLIC_KEY,
+      address: email
+    }
+  })
+    .then((response) => {
+      cb(response.data.is_valid);
+    })
+    .catch((err) => {
+      cb(err, 'error');
+    });
+};
 
 // for testing workers
 exports.fakeSend = (link, email, cb) => {
@@ -57,6 +91,4 @@ exports.fakeSend = (link, email, cb) => {
   console.log('email ==>', email);
   setTimeout(() => { cb(); }, 500);
 };
-
-
 

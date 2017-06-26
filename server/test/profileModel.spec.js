@@ -16,7 +16,7 @@ describe('Profile model tests', function () {
   it('Should be able to retrieve test data', function (done) {
     Profile.forge().fetchAll()
       .then(function (results) {
-        expect(results.length).to.equal(2);
+        expect(results.length).to.equal(5);
         expect(results.at(1).get('id')).to.equal(2);
         done();
       })

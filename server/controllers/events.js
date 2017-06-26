@@ -59,24 +59,45 @@ module.exports.getById = (req, res) => {
 };
 
 module.exports.getEventsByContributor = (req, res) => {
-  models.Event.query((qb) => {
-    qb.select(
-      'contributors.event_id',
-      'events.title',
-      'recipients.first_name',
-      'recipients.last_name',
-      'events.delivery_time'
-      );
-    qb.innerJoin('contributors', 'events.id', 'contributors.event_id');
-    qb.where('contributors.user_id', '=', req.user.id);
-    qb.innerJoin('recipients', 'recipients.event_id', 'events.id');
+  if (req.user) {
+    models.Event.query((qb) => {
+      qb.select(
+        'contributors.event_id',
+        'events.title',
+        'recipients.first_name',
+        'recipients.last_name',
+        'events.delivery_time'
+        );
+      qb.innerJoin('contributors', 'events.id', 'contributors.event_id');
+      qb.where('contributors.user_id', '=', req.user.id);
+      qb.innerJoin('recipients', 'recipients.event_id', 'events.id');
+    }).fetchAll()
+      .then(result => {
+        res.status(200).send(result);
+      })
+      .catch(err => {
+        res.status(500).send(err);
+      });
+  } else {
+    res.status(400).send('User not logged in');
+  }
+};
+
+module.exports.getRecipientEvents = (req, res) => {
+  models.Recipient.query((qb) => {
+    qb.select('recipients.id', 'recipients.event_id', 'events.title');
+    qb.innerJoin('events', 'recipients.event_id', 'events.id');
+    qb.where('recipients.email', '=', req.user.email);
+    qb.where('events.delivery_time', '<', 'now()');
+    qb.where('recipients.viewed', '=', 'false');
+
   }).fetchAll()
-    .then(result => {
-      res.status(200).send(result);
-    })
-    .catch(err => {
-      res.status(500).send(err);
-    });
+      .then(result => {
+        res.status(200).send(result);
+      })
+      .catch(err => {
+        res.status(500).send(err);
+      });
 };
 
 module.exports.update = (req, res) => {
